@@ -12,11 +12,13 @@
 NGINX_VERSION=${NGINX_VERSION-1.9.5}
 PCRE_VERSION=${PCRE_VERSION-8.37}
 ZLIB_VERSION=${ZLIB_VERSION-1.2.11}
+OPENSSL_VERSION=${OPENSSL_VERSION-1.0.2k}
 HEADERS_MORE_VERSION=${HEADERS_MORE_VERSION-0.261}
 
 nginx_tarball_url=http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 pcre_tarball_url=http://iweb.dl.sourceforge.net/project/pcre/pcre/${PCRE_VERSION}/pcre-${PCRE_VERSION}.tar.bz2
 zlib_tarball_url=http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz
+openssl_tarball_url=https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
 headers_more_nginx_module_url=https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz
 
 temp_dir=$(mktemp -d /tmp/nginx.XXXXXXXXXX)
@@ -37,6 +39,9 @@ echo "Downloading $pcre_tarball_url"
 echo "Downloading $zlib_tarball_url"
 (cd nginx-${NGINX_VERSION} && curl -L $zlib_tarball_url | tar xvz )
 
+echo "Downloading $openssl_tarball_url"
+(cd nginx-${NGINX_VERSION} && curl -L $openssl_tarball_url | tar xvz )
+
 echo "Downloading $headers_more_nginx_module_url"
 (cd nginx-${NGINX_VERSION} && curl -L $headers_more_nginx_module_url | tar xvz )
 
@@ -45,6 +50,9 @@ echo "Downloading $headers_more_nginx_module_url"
 	./configure \
 		--with-pcre=pcre-${PCRE_VERSION} \
 		--with-zlib=zlib-${ZLIB_VERSION} \
+		--with-openssl=openssl-${OPENSSL_VERSION} \
+                --with-http_ssl_module \
+                --with-http_stub_status_module \
 		--prefix=/tmp/nginx \
 		--add-module=/${temp_dir}/nginx-${NGINX_VERSION}/headers-more-nginx-module-${HEADERS_MORE_VERSION}
 	make install
